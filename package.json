@@ -1,15 +1,35 @@
-{
-  "name": "tiktok-backend",
-  "version": "1.0.0",
-  "main": "server.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "tiktok-live-connector": "latest",
-    "node-fetch": "^3.3.2"
-  }
-}
+const express = require('express');
+const app = express();
+
+const { WebcastPushConnection } = require('tiktok-live-connector');
+
+const PORT = process.env.PORT || 3000;
+
+// 👇 COLOCA UM USER REAL EM LIVE
+const tiktokUsername = "SEU_USER_AQUI";
+
+const tiktokLive = new WebcastPushConnection(tiktokUsername);
+
+// conecta na live
+tiktokLive.connect()
+  .then(() => {
+    console.log("✅ Conectado na live!");
+  })
+  .catch(err => {
+    console.error("❌ Erro ao conectar:", err);
+  });
+
+// captura presentes
+tiktokLive.on('gift', (data) => {
+  console.log("🎁 Presente recebido:", data.giftName);
+});
+
+// rota básica (IMPORTANTE)
+app.get("/", (req, res) => {
+  res.send("Bot online 🚀");
+});
+
+// inicia servidor
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
